@@ -1,0 +1,50 @@
+<?
+	/*
+		webstreams_info.class
+		
+		manages the webstreams
+	*/
+	require_once(dirname(__FILE__).'/iWebStreamerConfFile.class');
+	require_once(dirname(__FILE__).'/WebStream.class');
+	
+	class webstreams_info {
+	
+		var $webStreams_array = array();
+		var $idCount = 0;	
+	
+		function getWebStreamsArr(){
+			return $this->webStreams_array;
+		}
+		
+		function getWebStreamObj($webStreamId){
+			$webStreamObj=$this->webStreams_array[$webStreamId];
+			if(is_object($webStreamObj)){
+				return $webStreamObj;
+			}else{
+				return false;
+			}
+		}
+		
+		function addNewWebStream($name){
+			$webStreamObj=new WebStream($this->idCount, $name);
+			if($webStreamObj->getIsValid()){
+				$this->webStreams_array[$this->idCount]=$webStreamObj;
+				$this->idCount++;
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		function removeWebStream($webStreamId){
+			$newWebStreams_array=array();
+			foreach($this->getWebStreamsArr() as $thisWebStreamId => $thisWebStreamObj){
+				if($webStreamId != $thisWebStreamId){
+					$newWebStreams_array[$thisWebStreamId]=$thisWebStreamObj;
+				}
+			}
+			$this->webStreams_array=$newWebStreams_array;
+			return true;
+		}
+	} 
+?>

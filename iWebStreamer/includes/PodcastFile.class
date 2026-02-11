@@ -1,0 +1,326 @@
+<?
+	/*
+		class PodcastFile
+		
+		contains all the information for individual podcasts.
+		A better word might have been an episode class
+	*/
+	
+	class PodcastFile{
+	
+		var $podcastFileId='';//int - broadcast id, only specific to this podcast
+		var $fileId='';//what file is associated with this episode
+		var $pubDate='';//int - unix timestamp, later interpreted as ex. Wed, 15 Jun 2005 19:00:00 GMT
+		var $block='no'; //block this episode from appearing in the podcast directory, yes or no
+		var $duration=''; //how long is this track HH:MM:SS
+		var $explicit='clean';//yes, no, clean
+		var $keywords='';//not visible, but can be searched.  suggests to be limited
+		var $subtitle='';//subtitle
+		var $summary='';//can be a lengthy description
+		var $isRFAudio=false;
+		
+		var $isValid=false;//Php says no to constructor return values.
+		
+		
+		function PodcastFile($podcastFileId, $fileId, $pubDate, $block, $duration, $explicit, $keywords, $subtitle, $summary, $isRFAudio){
+		
+			if($this->setPodcastFileId($podcastFileId)&&
+			$this->setIsRFAudio($isRFAudio)&&
+			$this->setPubDate($pubDate)&&
+			$this->setBlock($block)&&
+			$this->setDuration($duration)&&
+			$this->setExplicit($explicit)&&
+			$this->setKeywords($keywords)&&
+			$this->setSubtitle($subtitle)&&
+			$this->setSummary($summary)&&
+			$this->setFileId($fileId)
+			){
+				//successfully added
+				$this->isValid=true;
+			}
+		}
+		
+		//---Getters
+		function getPodcastFileId(){
+			return $this->podcastFileId;
+		}
+		
+		function getFileId(){
+			return $this->fileId;
+		}
+		
+		function getTitle(){
+			if($this->getIsRFAudio()){
+				global $rfaudio_infoObj;
+				$rfAudioObj=$rfaudio_infoObj->getRfAudioFileObjById($this->getFileId());
+				return $rfAudioObj->getTitle();
+			}else{
+				global $fileInfoObj;
+				$fileObj=$fileInfoObj->getFileObj($this->getFileId());
+				return $fileObj->getTitle();
+			}
+		}
+		
+		function getAuthor(){
+			if($this->getIsRFAudio()){
+				global $rfaudio_infoObj;
+				$rfAudioObj=$rfaudio_infoObj->getRfAudioFileObjById($this->getFileId());
+				return $rfAudioObj->getAuthor();
+			}else{
+				global $fileInfoObj;
+				$fileObj=$fileInfoObj->getFileObj($this->getFileId());
+				return $fileObj->getAuthor();
+			}
+		}
+		
+		function getPubDate(){
+			return $this->pubDate;
+		}
+		
+		function getBlock(){
+			return $this->block;
+		}
+		
+		//in secs
+		function getDuration(){
+			return $this->duration;
+		}
+		
+		//string -> 00:00:00
+		function getDurationFormattedStr(){
+			$totalSecs=$this->getDuration();
+    			$hms = "";
+			$hours = intval(intval($totalSecs) / 3600); 
+    			$hms .= ($padHours) ? str_pad($hours, 2, "0", STR_PAD_LEFT). ':' : $hours. ':';
+			$minutes = intval(($totalSecs / 60) % 60); 
+			$hms .= str_pad($minutes, 2, "0", STR_PAD_LEFT). ':';
+			$seconds = intval($totalSecs % 60); 
+			$hms .= str_pad($seconds, 2, "0", STR_PAD_LEFT);
+			return $hms;
+		}
+		
+		function getExplicit(){
+			return $this->explicit;
+		}
+		
+		function getKeyWords(){
+			return $this->keywords;
+		}
+		
+		function getSubtitle(){
+			return $this->subtitle;
+		}
+		
+		function getSummary(){
+			return $this->summary;
+		}
+		
+		function getIsValid(){
+			return $this->isValid;
+		}
+		
+		function getUrl(){
+			if($this->getIsRFAudio()){
+				global $rfaudio_infoObj;
+				$rfAudioObj=$rfaudio_infoObj->getRfAudioFileObjById($this->getFileId());
+				return RFAUDIOBASEURL.$rfAudioObj->getFileName();
+			}else{
+				global $fileInfoObj;
+				$fileObj=$fileInfoObj->getFileObj($this->getFileId());
+				return AUDIOBASEURL.$fileObj->getFileName();
+			}
+		}
+		
+		function getFileSize(){
+			if($this->getIsRFAudio()){
+				global $rfaudio_infoObj;
+				$rfAudioObj=$rfaudio_infoObj->getRfAudioFileObjById($this->getFileId());
+				return $rfAudioObj->getFileSize();
+			}else{
+				global $fileInfoObj;
+				$fileObj=$fileInfoObj->getFileObj($this->getFileId());
+				return $fileObj->getFileSize();
+			}
+		}
+		
+		function getFileSizeBytes(){
+			if($this->getIsRFAudio()){
+				global $rfaudio_infoObj;
+				$rfAudioObj=$rfaudio_infoObj->getRfAudioFileObjById($this->getFileId());
+				return $rfAudioObj->getFileSizeBytes();
+			}else{
+				global $fileInfoObj;
+				$fileObj=$fileInfoObj->getFileObj($this->getFileId());
+				return $fileObj->getFileSizeBytes();
+			}
+		}
+		
+		function getIsRFAudio(){
+			return $this->isRFAudio;
+		}
+		
+		//-Special Getters (no directly corrosponding members)
+		
+		/*
+			Returns a date specified by the iTunes technical
+			specifications as a valid date format for an <item>'s
+			pubDate.
+			
+			This assumes that $podcasts_info->initializeTimeZone()
+			has been called.
+			
+			Should $podcasts_info->initializeTimeZone() crap out due
+			to a php upgrade and a now, invalid timezone, well now,
+			that sucks.  You would need to create the $podcast_infoObj
+			manually and set it to a valid time zone.  Let's hope I 
+			took the time to do this on this crazy crackhead flat
+			file object system here, lol.  That's really not funny 
+			if you are actually reading this.  Let's just blame it
+			on Alabanza's lack of a nice mysql database creation 
+			interface okay.  Dave Matthews Band rulz!!!
+		*/
+		function getFormattedPubDate(){
+			return date('r');
+		}
+		
+		//--Setters
+		
+		function setPodcastFileId($podcastFileId){
+			if(is_int($podcastFileId)){
+				$this->podcastFileId=$podcastFileId;
+				return true;
+			}else{
+				global $iWebStreamerErrorObj;
+				$iWebStreamerErrorObj->registerCritical("Failure to set a proper podcast file id.");
+				return false;
+			}
+		}
+		
+		//false on error. file doesn't exist
+		function setFileId($fileId){
+			global $fileInfoObj, $rfaudio_infoObj;
+			if($this->getIsRFAudio()){
+				if(array_key_exists($fileId, $rfaudio_infoObj->getRfAudioFileArr())){
+					$this->fileId=$fileId;
+					return true;
+				}else{
+					global $iWebStreamerErrorObj;
+					$iWebStreamerErrorObj->registerCritical('Royalty Free Audio File Id does not exist.');
+					return false;
+				}
+			}else{
+				if(array_key_exists($fileId, $fileInfoObj->getFilesArr())){
+					$this->fileId=$fileId;
+					return true;
+				}else{
+			
+					global $iWebStreamerErrorObj;
+					$iWebStreamerErrorObj->registerCritical('File Id does not exist.');
+					return false;
+				}
+			}
+		}
+		
+		
+		//$pubDate unix time stamp please
+		function setPubDate($pubDate){
+			if(is_int($pubDate)){
+				$this->pubDate=$pubDate;
+				return true;
+			}else{
+				global $iWebStreamerErrorObj;
+				$iWebStreamerErrorObj->registerCritical('Invalid publish date.');
+				return false;
+			}
+		}
+		
+		//false, incorrect parameter
+		//block = yes,no
+		function setBlock($block){
+			if($block=='yes'||$block=='no'){
+				$this->block=$block;
+				return true;
+			}else{
+				global $iWebStreamerErrorObj;
+				$iWebStreamerErrorObj->registerCritical('Improper block string.');
+				return false;
+			}
+		}
+		
+		//just passing the number of seconds.  This is okay
+		//according to iTunes specifications
+		//if not fail, return false
+		function setDuration($duration){
+			if(is_int($duration)){
+				$this->duration=$duration;
+				return true;
+			}else{
+				global $iWebStreamerErrorObj;
+				$iWebStreamerErrorObj->registerCritical('Failure to properly set duration.');
+				return false;
+			}
+		}
+		
+		//yes, no, clean
+		function setExplicit($explicit){
+			if($explicit=='yes'||$explicit=='no'||$explicit=='clean'){
+				$this->explicit=$explicit;
+				return true;
+			}else{
+				global $iWebStreamerErrorObj;
+				$iWebStreamerErrorObj->registerCritical('Improper explicit string.');
+				return false;
+			}
+		}
+		
+		//as of writing this script, it must be no more than 12 keywords,
+		//seperated by commas, hence the regex nightmare
+		function setKeywords($keywords){
+			$splitOnCommaArr=preg_split('/\,/', $keywords);
+			$keywords='';
+			foreach($splitOnCommaArr as $index => $word){
+				$word=trim($word);
+				if(!preg_match('/^\w*$/', $word)){
+					global $iWebStreamerErrorObj;
+					$iWebStreamerErrorObj->registerCritical('Not a valid keyword string.  You must enter only keywords (not phrases) seperated by commas.');
+					return false;
+				}
+				$keywords.=$word.',';
+			}
+			$keywords=substr($keywords,0,strlen($keywords)-1);
+			$this->keywords=$keywords;
+			return true;
+		}
+		
+		//no restrictions really specified in official docs, just
+		//recommended limited usage of it
+		function setSubtitle($subtitle){
+			$this->subtitle=$subtitle;
+			return true;
+		}
+		
+		//as of writing this program,, the itunes directory limits this to
+		//to 4000 characters
+		function setSummary($summary){
+			if(strlen(trim($summary))>4000){
+				global $iWebStreamerErrorObj;
+				$iWebStreamerErrorObj->registerCritical('Summary length exceeded.  It can not exceed 4,000 characters.');
+				return false;
+			}else{
+				$this->summary=$summary;
+				return true;
+			}
+		}
+		
+		function setIsRFAudio($isRFAudio){
+			if(is_bool($isRFAudio)){
+				$this->isRFAudio=$isRFAudio;
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+	}
+
+?>

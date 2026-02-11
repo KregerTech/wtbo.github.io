@@ -1,0 +1,124 @@
+<?
+	class WebStreamFile{
+	
+		var $webStreamFileId='';
+		var $fileId='';
+		var $isRFAudio=false;
+		var $isValid=false;
+		
+		function WebStreamFile($webStreamFileId, $fileId, $isRFAudio){
+			if($this->setWebStreamFileId($webStreamFileId)&&
+			$this->setIsRFAudio($isRFAudio)&&
+			$this->setFileId($fileId)){
+				$this->isValid=true;
+			}else{
+				$this->isValid=false;
+			}
+		}
+		
+		function getWebStreamFileId(){
+			return $this->webStreamFileId;
+		}
+		
+		function getFileId(){
+			return $this->fileId;
+		}
+		
+		function getIsRFAudio(){
+			return $this->isRFAudio;
+		}
+		
+		function getIsValid(){
+			return $this->isValid;
+		}
+		
+		function getTitle(){
+			if($this->getIsRFAudio()){
+				global $rfaudio_infoObj;
+				$rfAudioObj=$rfaudio_infoObj->getRfAudioFileObjById($this->getFileId());
+				return $rfAudioObj->getTitle();
+			}else{
+				global $fileInfoObj;
+				$fileObj=$fileInfoObj->getFileObj($this->getFileId());
+				return $fileObj->getTitle();
+			}
+		}
+		
+		function getAuthor(){
+			if($this->getIsRFAudio()){
+				global $rfaudio_infoObj;
+				$rfAudioObj=$rfaudio_infoObj->getRfAudioFileObjById($this->getFileId());
+				return $rfAudioObj->getAuthor();
+			}else{
+				global $fileInfoObj;
+				$fileObj=$fileInfoObj->getFileObj($this->getFileId());
+				return $fileObj->getAuthor();
+			}
+		}
+		
+		function getDuration(){
+			if($this->getIsRFAudio()){
+				global $rfaudio_infoObj;
+				$rfAudioObj=$rfaudio_infoObj->getRfAudioFileObjById($this->getFileId());
+				return $rfAudioObj->getDuration();
+			}else{
+				global $fileInfoObj;
+				$fileObj=$fileInfoObj->getFileObj($this->getFileId());
+				return $fileObj->getDuration();
+			}
+		}
+		
+		function getUrl(){
+			if($this->getIsRFAudio()){
+				global $rfaudio_infoObj;
+				$rfAudioObj=$rfaudio_infoObj->getRfAudioFileObjById($this->getFileId());
+				return RFAUDIOBASEURL.$rfAudioObj->getFileName();
+			}else{
+				global $fileInfoObj;
+				$fileObj=$fileInfoObj->getFileObj($this->getFileId());
+				return AUDIOBASEURL.$fileObj->getFileName();
+			}
+		}
+		
+		function setWebStreamFileId($webStreamFileId){
+			if(is_int($webStreamFileId)){
+				$this->webStreamFileId=$webStreamFileId;
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		function setFileId($fileId){
+			global $fileInfoObj, $rfaudio_infoObj;
+			if($this->getIsRFAudio()){
+				if(is_object($rfaudio_infoObj->getRfAudioFileObjById($fileId))){
+					$this->fileId=$fileId;
+					return true;
+				}else{
+				
+					return false;
+				}
+			}else{
+				if(is_object($fileInfoObj->getFileObj($fileId))){
+					$this->fileId=$fileId;
+					return true;
+				}else{
+				
+					return false;
+				}
+			}
+		}
+		
+		function setIsRFAudio($isRFAudio){
+			if(is_bool($isRFAudio)){
+				$this->isRFAudio=$isRFAudio;
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		
+	}
+?>

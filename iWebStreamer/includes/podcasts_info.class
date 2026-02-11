@@ -1,0 +1,144 @@
+<?
+	/*
+		podcasts_info.class
+		
+		manages the podcasts
+	*/
+	require_once(dirname(__FILE__).'/Podcast.class');
+	
+	
+	
+	class podcasts_info {
+		
+		var $podcasts_array =  array();
+		var $idCount = 0;
+		var $tZone='US/Eastern';//display times in this program in the local time
+					//zone, but all times will be broadcast using gmt
+		var $isoCode='en';//not used to determine the language of podcasting
+				  //only to associate it with a language in the iTunes
+				  //catalog
+		
+		function podcasts_info(){
+			$this->initializeTimeZone();
+		}		  
+				  
+		function initializeTimeZone(){
+			if(!date_default_timezone_set($this->getCurrTimeZone())){
+				global $iWebStreamerErrorObj;
+				$iWebStreamerErrorObj->registerCritical("Invalid Time Zone Identifier.");
+			}
+		}
+		
+		function addPodcast($title, $link, $copyright, $author, $block, $category, $explicit, $keywords, 
+		$name, $email, $subtitle, $summary, $ttl){
+			$podcast=new Podcast($this->idCount, $title, $link, $copyright, $author, $block, $category, $explicit, $keywords, $name, $email, $subtitle, $summary, $ttl);
+			if($podcast->isValid){
+				$this->podcasts_array[$this->idCount]=$podcast;
+				$this->idCount++;
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		function removePodcast($podcastId){
+			$newPodcastsArray=array();
+			foreach($this->getPodcastsArr() as $thisPodcastId => $podcastObj){
+				if($thisPodcastId!=$podcastId){
+					$newPodcastsArray[$thisPodcastId]=$podcastObj;
+				}
+			}
+			$this->podcasts_array=$newPodcastsArray;
+		}
+		
+		function getPodcastsArr(){
+			return $this->podcasts_array;
+		}
+		
+		function getPodcastObj($podcastId){
+			if(array_key_exists($podcastId, $this->getPodcastsArr())){
+				return $this->podcasts_array[$podcastId];
+			}else{
+				return false;
+			}
+		}
+		
+		
+		
+		function getCurrTimeZone(){
+			return $this->tZone;
+		}
+		
+		function getCurrIsoCode(){
+			return $this->isoCode;
+		}
+		
+		function getItunesCategoriesArr(){
+			if(file_exists(ITUNESCATEGORIESFILE)){
+				require_once(ITUNESCATEGORIESFILE);
+				return $iTunesCategories;
+			}else{
+				global $iWebStreamerErrorObj;
+				$iWebStreamerErrorObj->registerCritical("Unable to read iTunes categories file.");
+				return false;
+			}
+		}
+		
+		function setTimeZone($tZone){
+			
+			if(in_array($tZone, timezone_identifiers_list())){
+				$this->tZone=$tZone;
+				$this->initializeTimeZone();
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		//two letter language code
+		function setIsoCode($isoCode){
+			if(array_key_exists($isoCode, $this->getIsoCodes())){
+				$this->isoCode=$isoCode;
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		/*
+			At the time of writing this script,
+			podcasting had been standardized on the
+			iso 639-1 Alpha 2 list.  I wouldn't 
+			recommend changing this as it would
+			likely break older iPods and unupdated
+			versions of iTunes and other podcasting
+			listening software.  Let's just pray for
+			world stability for the sake of Steve Jobs
+			and his iPod.
+			
+			isoArr[2-letter-codeStr]="description"
+		*/
+		function getIsoCodes(){
+			global $iWebStreamerErrorObj;
+			$isoArr=array();
+			$handle = fopen(LANGUAGEFILE, "r");
+				if ($handle) {
+   					while (!feof($handle)) {
+						$buffer = trim(fgets($handle));
+						if(!preg_match('/^#/', $buffer)){
+							//split on spaces to find the time zone names
+							if(preg_match('/^.+\|{1,1}.+$/', $buffer)){
+								$tmpLineSplit=preg_split('/\|/',$buffer);
+								$isoArr[trim($tmpLineSplit[0])]=trim($tmpLineSplit[1]);
+							}
+							
+						}
+					}
+				}else{
+					$iWebStreamerErrorObj->registerCritical("Unable to read language codes file.");
+				}
+				fclose($handle);
+				return $isoArr;
+		}
+	} 
+?>

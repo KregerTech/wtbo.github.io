@@ -1,0 +1,2 @@
+# Sample crontab command file for Perlshop 4 CLEAN script
+0 4 * * * csh -c 'cd /home/youraccount/cgi-bin; ./CLEAN >& /dev/null'

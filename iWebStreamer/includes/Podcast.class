@@ -1,0 +1,286 @@
+<?
+/*
+	class Podcast
+	
+	Defines information specific to a a podcast
+*/		
+
+require_once(dirname(__FILE__).'/PodcastFile.class');
+		
+class Podcast{
+
+	var $idCount=0;
+	var $podcastFiles_array =  array(); //the episodes associated with this podcast
+	
+	var $podcastId='';
+	var $title='';
+	var $link='';
+	var $copyright='';//not visible in itunes
+	var $author='';
+	var $block='no';
+	var $category=array();//category=array[Main Cat]=>'sub cat' - limit of three and 'Sub Cat' is not required.
+	var $explicit='clean';//yes, no, clean
+	var $keywords='';//not visible, but can be searched.  suggests to be limited
+	var $name='';//not publicly displayed at in the itunes directory
+	var $email='';//submsted tag of name, so name must exist for this to exist
+	var $subtitle='';//subtitle
+	var $summary='';//can be a lengthy description
+	var $ttl='';
+	
+	var $isValid=false;//used only during the constructor phase.  used by the parent
+			   //object to decide whether or not to add to the array.  Otherwise
+			   //use the setter returns when making modifications.
+	
+		function Podcast($podcastId, $title, $link, $copyright, $author, $block, $category, $explicit, 
+		$keywords, $name, $email, $subtitle, $summary, $ttl){
+			if($this->setPodcastId($podcastId)&&
+			$this->setTitle($title)&&
+			$this->setLink($link)&&
+			$this->setCopyright($copyright)&&
+			$this->setAuthor($author)&&
+			$this->setBlock($block)&&
+			$this->setCategory($category)&&
+			$this->setExplicit($explicit)&&
+			$this->setKeywords($keywords)&&
+			$this->setName($name)&&
+			$this->setEmail($email)&&
+			$this->setSubtitle($subtitle)&&
+			$this->setSummary($summary)&&
+			$this->setTTL($ttl)){
+				$this->isValid=true;
+			}
+		}
+	
+		//Add a podcastFile to this podcast
+	
+		function addPodcastFile($fileId, $pubDate, $block, $duration, $explicit, $keywords, $subtitle, $summary, $isRFAudio){
+			$podcastFile=new PodcastFile($this->idCount, $fileId, $pubDate, $block, $duration, $explicit, $keywords, $subtitle, $summary, $isRFAudio);
+			if($podcastFile->getIsValid()){
+				$this->podcastFiles_array[$this->idCount]=$podcastFile;
+				$this->idCount++;
+				return true;
+			}else{
+				return false;
+			}
+			
+		}
+		
+		function removePodcastFile($podcastFileId){
+			$newPodcastFilesArray=array();
+			foreach($this->getPodcastFilesArr() as $thisPodcastFileId => $podcastFileObj){
+				if($thisPodcastFileId!=$podcastFileId){
+					$newPodcastFilesArray[$thisPodcastFileId]=$podcastFileObj;
+				}
+			}
+			$this->podcastFiles_array=$newPodcastFilesArray;
+		}
+	
+		//-----getters
+		
+		function getPodcastFileObj($podcastFileId){
+			if(array_key_exists($podcastFileId, $this->getPodcastFilesArr())){
+				
+				return $this->podcastFiles_array[$podcastFileId];
+			}else{
+				global $iWebStreamerErrorObj;
+				$iWebStreamerErrorObj->registerCritical("Unable to return podcast array.");
+				return false;
+			}
+		}
+		
+		function getPodcastId(){
+			return $this->podcastId;
+		}
+		
+		function getTitle(){
+			return $this->title;
+		}
+		
+		function getLink(){
+			return $this->link;
+		}
+		
+		function getCopyright(){
+			return $this->copyright;
+		}
+		
+		function getAuthor(){
+			return $this->author;
+		}
+		
+		function getCategory(){
+			return $this->category;
+		}
+		
+		function getExplicit(){
+			return $this->explicit;
+		}
+		
+		function getKeywords(){
+			return $this->keywords;
+		}
+		
+		function getPodcastFilesArr(){
+			return $this->podcastFiles_array;
+		}
+		
+		function getName(){
+			return $this->name;
+		}
+		
+		function getEmail(){
+			return $this->email;
+		}
+		
+		function getSubtitle(){
+			return $this->subtitle;
+		}
+		
+		function getSummary(){
+			return $this->summary;
+		}
+		
+		function getBlock(){
+			return $this->block;
+		}
+		
+		function getTTL(){
+			return intval($this->ttl);
+		}
+		
+		function getFeedUrl(){
+			return 'http://www.'.DOMAINNAME.'/cgi-sys/iWebStreamer/podcast.rss?podcastId='.$this->getPodcastId();
+		}
+		
+		function getFeedItpc(){
+			return 'itpc://www.'.DOMAINNAME.'/cgi-sys/iWebStreamer/podcast.rss?podcastId='.$this->getPodcastId();
+		}
+		
+		//-----setters
+		
+		function setPodcastId($podcastId){
+			if(is_int($podcastId)){
+				$this->podcastId=$podcastId;
+				return true;
+			}else{
+				global $iWebStreamerErrorObj;
+				$iWebStreamerErrorObj->registerCritical("Failure to set a proper podcast id.");
+				return false;
+			}
+		}
+		
+		function setTitle($title){
+			$this->title=$title;
+			return true;
+		}
+		
+		function setLink($link){
+			$this->link=$link;
+			return true;
+		}
+		
+		function setCopyright($copyright){
+			$this->copyright=$copyright;
+			return true;
+		}
+		
+		function setAuthor($author){
+			$this->author=$author;
+			return true;
+		}
+		
+		//input is array
+		function setCategory($category){
+			if(is_array($category)){
+				$this->category=$category;
+				return true;
+			}else{
+				global $iWebStreamerErrorObj;
+				$iWebStreamerErrorObj->registerCritical("Category is either not an array or an array
+				that is great is not between 0 and 3 in size.");
+				return false;
+			}
+		}
+		
+		//yes, no, clean
+		function setExplicit($explicit){
+			if($explicit=='yes'||$explicit=='no'||$explicit=='clean'){
+				$this->explicit=$explicit;
+				return true;
+			}else{
+				global $iWebStreamerErrorObj;
+				$iWebStreamerErrorObj->registerCritical("Invalid explicit setting.");
+				return false;
+			}
+		}
+		
+		//no restrictions really specified in official docs, just
+		//recommended limited usage of it
+		function setKeywords($keywords){
+			$this->keywords=$keywords;
+			return true;
+		}
+		
+		function setName($name){
+			$this->name=$name;
+			return true;
+		}
+		
+		function setEmail($email){
+			//just doing a small check for @
+			//if anything has been entered.
+			//it's not required, so can be blank too
+			if(preg_match('/@/', $email)||$email==''){
+				$this->email=$email;
+				return true;
+			}else{
+				global $iWebStreamerErrorObj;
+				$iWebStreamerErrorObj->registerCritical("Invalid email.");
+				return false;
+			}
+		}
+		
+		//no restrictions really specified in official docs, just
+		//recommended limited usage of it
+		function setSubtitle($subtitle){
+			$this->subtitle=$subtitle;
+			return true;
+		}
+		
+		//as of writing this program,, the itunes directory limits this to
+		//to 4000 characters
+		function setSummary($summary){
+			if(strlen(trim($summary))>4000){
+				return false;
+			}else{
+				$this->summary=$summary;
+				return true;
+			}
+		}
+		
+		//false, incorrect parameter
+		//block = yes,no,clean
+		function setBlock($block){
+			if($block=='yes'||$block=='no'){
+				$this->block=$block;
+				return true;
+			}else{
+				global $iWebStreamerErrorObj;
+				$iWebStreamerErrorObj->registerCritical("Invalid block string.");
+				return false;
+			}
+		}
+		
+		function setTTL($ttl){
+			if(is_int($ttl)){
+				$this->ttl=$ttl;
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		
+}
+
+?>

@@ -1,0 +1,41 @@
+<?
+	/*
+		iWebStreamerConf class
+		
+		This class manages the conf file and
+	*/
+	
+	require_once(dirname(__FILE__).'/file_info.class');
+	require_once(dirname(__FILE__).'/podcasts_info.class');
+	require_once(dirname(__FILE__).'/webstreams_info.class');
+	require_once(dirname(__FILE__).'/PodcastFile.class');
+	
+	class iWebStreamerConf {
+		
+		var $file_infoObj;
+		var $podcasts_infoObj;
+		var $webstreams_infoObj;
+		
+		function iWebStreamerConf (){
+			$this->initializeWebStreamerConf();
+		}
+		
+		function initializeWebStreamerConf(){
+			$this->file_infoObj=new file_info();
+			$this->podcasts_infoObj=new podcasts_info ();
+			$this->webstreams_infoObj= new webstreams_info ();
+		}
+		
+		function getFileInfoObj(){
+			return $this->file_infoObj;
+		}
+		
+		function getPodcastsInfoObj(){
+			return $this->podcasts_infoObj;
+		}
+		
+		function getWebStreamsInfoObj(){
+			return $this->webstreams_infoObj;
+		}
+	}
+?>

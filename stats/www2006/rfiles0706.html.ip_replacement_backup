@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+  <META NAME="ROBOTS" CONTENT="NONE">
+  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<TITLE>Access Statistics for whentwobecomeone.net (July 2006)</TITLE>
+<BASE TARGET="_top">
+</HEAD>
+<BODY BGCOLOR="#EFEFEF">
+<FONT FACE="Helvetica,Arial,Geneva,sans-serif">Code 404 Not Found Requests</FONT>
+<FONT SIZE="2"><PRE>
+    Hits Sessions     Bytes sent | URL
+--------------------------------------------------------------------------------------------------
+     117      100          24228 | /robots.txt
+       5        3           1039 | /index.php
+       5        5           1160 | /a1b2c3d4e5f6g7h8i9/nonexistentfile.php
+       5        0           1075 | /adserver/adxmlrpc.php
+       5        0           1030 | /adxmlrpc.php
+       4        0            888 | /blog/xmlsrv/xmlrpc.php
+       4        0            892 | /phpgroupware/xmlrpc.php
+       3        0            699 | /scgi-bin/awstats/awstats.pl
+       2        0            512 | /scripts/..%2f..%2f..%2f..%2fwinnt/system32/cmd.exe
+       2        0            536 | /iisadmpwd/..%2f..%2f..%2f..%2f..%2f..%2fwinnt/system32/cmd.exe
+       2        0            442 | /html/xmlrpc.php
+       2        0            484 | /scripts..^^Ü../winnt/system32/cmd.exe
+       2        0            488 | /scripts/..^ ^À^ï../winnt/system32/cmd.exe
+       2        0            428 | /b2/xmlsrv/xmlrpc.php
+       2        0            476 | /extensions/moblog/moblog_lib.php
+       2        0            446 | /scripts/shell.exe
+       2        0            462 | /scgi-bin/stats/awstats.pl
+       2        1            434 | //awstats.pl
+       2        0            486 | /scripts/..^^ï../winnt/system32/cmd.exe
+       2        0            432 | /index2.php
+       2        0            440 | /protection.php
+       1        0            228 | /finance/protection.php
+       1        0            224 | /cal/protection.php
+       1        0            240 | /php/phpmychat//chat/messagesL.php3
+       1        0            217 | /Classes.php
+       1        0            222 | /admin/signin.php
+       1        0            232 | /chat3//chat/messagesL.php3
+       1        0            223 | /br/protection.php
+       1        0            233 | /cgi-bin2/awstats/awstats.pl
+       1        0            231 | /awstats-cgibin/awstats.pl
+       1        0            230 | //phpgroupware/xmlrpc.php
+       1        0            207 | /mm5/admin.mvc
+       1        0            228 | /content/protection.php
+       1        0            226 | //phpads/adxmlrpc.php
+       1        0            233 | /forums//chat/messagesL.php3
+       1        0            226 | /pages/protection.php
+       1        0            220 | /aws/awstats.pl
+       1        1            219 | http://check.65.108.216.4.v.80.pdx8.super.proxy.scanner.ii.9966.org/Provy_OK.html
+       1        0            223 | /signin/signin.php
+       1        0            226 | /training/classes.php
+       1        0            227 | //community/xmlrpc.php
+       1        0            225 | /data/protection.php
+       1        0            233 | //blogtest/xmlsrv/xmlrpc.php
+       1        0            239 | /helpdesk/documents/protection.php
+       1        0            225 | /classes/classes.php
+       1        0            237 | /estadisticas/cgi-bin/awstats.pl
+       1        0            233 | /include/config_settings.php
+--------------------------------------------------------------------------------------------------
+     606      130         136168 
+==================================================================================================</PRE></FONT>
+<CENTER><P ALIGN="CENTER">
+<TABLE BORDER="4" WIDTH="100%" CELLPADDING="0" CELLSPACING="0">
+<TR><TD><TABLE WIDTH="100%" CELLPADDING="0" CELLSPACING="0">
+<TR><TD NOWRAP ALIGN="LEFT"><FONT SIZE="1" FACE="Helvetica,Arial,Geneva,sans-serif"><A TARGET="_blank" HREF="http://www.http-analyze.org/">http-analyze 2.4</A></FONT></TD>
+<TD NOWRAP ALIGN="RIGHT"><FONT SIZE="1" FACE="Helvetica,Arial,Geneva,sans-serif">01/Aug/2006 02:00</FONT></TD></TR>
+</TABLE></TD></TR>
+</TABLE></P>
+</CENTER>
+</BODY>
+</HTML>

@@ -1,0 +1,21 @@
+mkdir catalog
+mkdir catalog/psdbi
+mkdir catalog/template
+mkdir customers
+mkdir customers/deleted
+mkdir log
+mkdir notes
+mkdir notes/converted
+mkdir notes/deleted
+mkdir orders
+mkdir orders/deleted
+mkdir plugins
+mkdir plugins/files
+mkdir temp_customers
+mkdir temp_customers/converted
+mkdir temp_customers/deleted
+mkdir temp_orders
+mkdir temp_orders/converted
+mkdir temp_orders/deleted
+mkdir tokens
+

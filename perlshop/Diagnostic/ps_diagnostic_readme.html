@@ -1,0 +1,64 @@
+
+<html>
+<head>
+<title>Perlshop 4 State Recorder Plugin</title>
+</head>
+
+<body bgcolor="white">
+<pre>
+
+Waverider Systems
+http://www.WaveriderSystems.com
+
+Perlshop 4 Diagnostic Plugin
+Version 1.0
+
+
+This plugin requires Perlshop 4.2.06 or later.  
+
+Installation Procedure:
+1.	Place the ps_plugin_diagnostic.pl file into the same web server directory as your perlshop.cgi file.
+
+2.	Give the ps_plugin_diagnostic.pl file the same file permissions as your perlshop.cgi file.
+
+3.	Add the diagnostic plugin to the plugin registration table in your ps.cfg file.
+
+Example plugin registration table before adding the diagnostic plugin:
+# Plugin modules.  See the external documentation for details.
+%plugins =
+(
+	# Calendar example plugin
+	'calendar'  => 
+	{
+		'program'	=> 'gencal.pl'
+	}
+);
+
+
+Example plugin registration table after adding the diagnostic plugin:
+# Plugin modules.  See the external documentation for details.
+%plugins =
+(
+	# Calendar example plugin
+	'calendar'		=> 
+	{
+		'program'	=> 	'ps_plugin_gencal.pl'
+	},
+
+	# Diagnostic plugin
+	'diagnostic'	=>
+	{
+		'program'	=>	'ps_plugin_diagnostic.pl',
+		'event'	=>	'.*'
+	}
+);
+
+
+
+</pre>
+</body>
+</html>
+
+
+
+

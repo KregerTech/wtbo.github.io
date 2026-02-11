@@ -1,0 +1,11 @@
+find tokens					-mtime  +1  -exec rm -f {} \;
+find temp_customers	-mtime +30  -exec rm -f {} \;
+find temp_customers/deleted	-mtime +30  -exec rm -f {} \;
+find temp_orders	-mtime +30  -exec rm -f {} \;
+find temp_orders/deleted    -mtime +30  -exec rm -f {} \;
+find customers/deleted		-mtime +30  -exec rm -f {} \;
+find orders/deleted			-mtime +30  -exec rm -f {} \;
+find notes/deleted			-mtime +30  -exec rm -f {} \;
+
+rm -f core
+

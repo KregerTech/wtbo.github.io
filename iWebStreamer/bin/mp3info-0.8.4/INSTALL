@@ -1,0 +1,52 @@
+Installing MP3info from source
+==============================
+
+Unpack and decompress the archive file, then change the current working
+directory to the directory created by unpacking the archive.  The following
+two commands should accomplish this:
+
+	tar -xzvf mp3info-x.y.tgz
+	cd mp3info-x.y
+	
+Next, edit the top of the Makefile and make any changes necessary to reflect your environment.
+The defaults are valid for Red Hat Linux 6.2 systems, but will probably work for many others.
+
+Next, run the following two commands.
+
+	make
+	make install 		(this command must be run by the root user)
+
+If you want to compile just the console or GTK version use 'make mp3info' or 
+'make gmp3info' (respectively).
+
+... and that's it. There should be a binary named mp3info and/or another named 
+gmp3info in whatever the 'prefix' variable is set to in the Makefile (the 
+default is /usr/local/bin)
+
+TROUBLESHOOTING
+===============
+
+If 'make install' results in an error like the following:
+
+     install: cannot create regular file `/usr/local/man/man1/mp3info.1': No such file or directory
+     
+you probably need to go back and edit the 'manpath' setting in the Makefile.  The manpath variable
+must reflect one of your system's repositories for manual pages -- specifically for section 1 manual
+pages (so specifying /foo/bar/man would not be sufficient -- you would need to specify 
+/foo/bar/man/man1 or /foo/bar/man/sman1 or whatever reflects reality).
+
+If you have trouble determining where your system's man pages are stored, try examining
+your MANPATH environment variable or see man's own man page (i.e run 'man 1 man').
+
+
+Installing the pre-compiled binaries
+====================================
+Run the following command as the root user.  Note that you must have the Redhat Package Manager (RPM)
+installed.  If you don't have RPM installed on your system, you can get it from the RedHat web site
+(www.redhat.com), but you will probably find it easier to build from source code.
+
+	rpm -ivh mp3info-x.y-z.i386.rpm
+	
+If you are upgrading from a previous version of MP3Info, use this command:
+
+	rpm -Uvh mp3info-x.y-z.i386.rpm

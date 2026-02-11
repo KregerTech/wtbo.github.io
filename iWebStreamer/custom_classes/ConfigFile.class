@@ -1,0 +1,281 @@
+<?
+
+	/*
+		ConfigFile.class
+		Provides methods to read and write config files
+		located in the /home/user directory.
+		
+		NOTE: This only works properly when calling php as a cgi
+		due to permissions (www can't read or write in /home/user)
+		
+		Constructor
+			ConfigFile('conf_file_name')
+			
+		public
+			isValid - does the object initialize successfully?
+			bool confExists - true, conf file exists
+			string readConf - return string with conf file contents.  false, if unable to read the file.
+			bool writeConf - true, file wrote successfully.  false, unable to write the file.
+			
+			*some special public functions that allow for reading and writing conf data
+			encrypted with the Encryption.class quickly
+			
+			readEncConf
+			writeEncConf
+			
+	*/
+	
+	require_once(dirname(__FILE__).'/UserInfo.class');
+	
+	class Configfile {
+	
+		var $userRoot;
+		var $validObj;
+		var $confFileNameStr;
+		
+		function ConfigFile($confFileNameStr, $userName=''){
+			
+			/*
+			if(!$userName){
+				$userObj = new UserInfo ();
+				$this->userRoot=$userObj->getUserRootDir();
+				//can this script modify files in the user root?
+				/*
+				Removing this stuff to make this compatible with cron jobs
+				and justs setting validObj to true for backwards compatibiity.
+				Hey, if the userRoot isn't writable, what's the worst that could
+				happen anyway
+			
+				if(($userObj->isValid())&&(is_writeable($this->userRoot))){
+					$this->validObj=true;
+					$this->confFileNameStr=$this->userRoot.'/'.$confFileNameStr;
+				}else{
+					$this->validObj=false;
+				}
+			
+			
+			
+			$this->confFileNameStr=$this->userRoot.'/'.$confFileNameStr;
+			$this->validObj=true;
+			}else{
+				$this->confFileNameStr='/home/'.$userName.'/'.$confFileNameStr;
+			}
+		
+			*/
+	
+			global $_SERVER;
+			$this->confFileNameStr=dirname(__FILE__)."/../../../private/".$confFileNameStr;
+			
+		}
+		
+		//public
+		//There may be some scripts that don't assume /home/user
+		//as the start of the conf file path.
+		//This is a way to override those times
+		function setConfPath($path){
+			$this->confFileNameStr=$path.'/'.basename($this->confFileNameStr);
+		}
+		
+		function getConfStr(){
+			return $this->confFileNameStr;
+		}
+		
+		//public
+		//is the object valid.  useful for error checking
+		function isValid(){
+			return $this->validObj;
+		}
+		
+		//public
+		function confExists(){
+			clearstatcache();
+			if(file_exists($this->confFileNameStr)){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		function touchConf(){
+			touch($this->confFileNameStr);
+			if($this->confExists()){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		//public
+		//returns a string with the conf file contents
+		//or false if unable to read it.
+		function readConf(){
+			if($this->confExists()&&is_readable($this->confFileNameStr)){
+				$confFilePtr=fopen($this->confFileNameStr, 'r');
+				if(is_resource($confFilePtr)){
+					flock($confFilePtr, LOCK_EX);
+					$confStr = file_get_contents($this->confFileNameStr);
+					flock($confFilePtr, LOCK_UN);
+					fclose($confFilePtr);
+					
+					//return file as a string
+					return $confStr;
+				}else{
+					//unable to read the conf file
+					return false;
+				}
+			}else{
+				
+				//unable to read the conf file
+				return false;
+			}
+		}
+		
+		//public
+		//bool
+		//true - successful write
+		//false - failed to write
+		function writeConf($newConfContents){
+		
+			//backup the original first if it exists
+			if(file_exists($this->confFileNameStr)){
+				if(!copy($this->confFileNameStr, $this->confFileNameStr.'.bak')){
+					return false;
+				}
+				if(md5_file($this->confFileNameStr)!=md5_file($this->confFileNameStr.'.bak')){
+					return false;
+				}
+			}
+			
+			//now write to a temp file, test to make sure the
+			//contents are the same as what we expect to write
+			//and rename the file on success.
+			$confFilePtr=fopen($this->confFileNameStr.'.tmp', 'w+');
+			if(is_resource($confFilePtr)){
+				flock($confFilePtr, LOCK_EX);
+				$writeResult = fwrite($confFilePtr, $newConfContents);
+				if($writeResult){
+					//now read it back, do we get the same thing?
+					rewind($confFilePtr);
+					$fromTmp=file_get_contents($this->confFileNameStr.'.tmp');
+					if(strcmp($fromTmp, $newConfContents)==0){
+						if(rename($this->confFileNameStr.'.tmp', $this->confFileNameStr)){
+							flock($confFilePtr, LOCK_UN);
+							fclose($confFilePtr);
+							return true;
+						}else{
+							flock($confFilePtr, LOCK_UN);
+							fclose($confFilePtr);
+							//if the renaming fails, attempt to copy the backup
+							//over to the original again.
+							copy($this->confFileNameStr.'.bak', $this->confFileNameStr);
+							return false;
+						}
+					}else{
+						flock($confFilePtr, LOCK_UN);
+						fclose($confFilePtr);
+						//if the contents don't match, something probably went wrong.
+						//try to copy the backup over to the original again
+						copy($this->confFileNameStr.'.bak', $this->confFileNameStr);
+						return false;
+					}	
+				
+				}else{
+					flock($confFilePtr, LOCK_UN);
+					fclose($confFilePtr);
+					copy($this->confFileNameStr.'.bak', $this->confFileNameStr);
+					return false;
+				}
+			}else{
+				//failed to open for writing
+				copy($this->confFileNameStr.'.bak', $this->confFileNameStr);
+				return false;
+			}
+		}
+		
+		
+		
+		//bool
+		//true = string containing conf file as a string
+		//false = unable to read conf file
+		function readEncConf(){
+			require_once(dirname(__FILE__).'/Encryption.class');
+			$encObj=new Encryption ();
+			$encryptedConfStr=$this->readConf();
+			if($encryptedConfStr){
+				$decryptedConfStr=$encObj->decrypt($encryptedConfStr);
+				return $decryptedConfStr;
+			}else{
+				return false;
+			}
+		}
+		
+		//bool
+		//true = conf written successfully
+		//false = conf failed to write
+		function writeEncConf($newConfPlainTxtStr){
+			require_once(dirname(__FILE__).'/Encryption.class');
+			$encObj=new Encryption ();
+			$newConfEncStr=$encObj->encrypt($newConfPlainTxtStr);
+			
+			//quick test, can we still decrypt and get the same thing?
+			$testPlainText=$encObj->decrypt($newConfEncStr);
+			
+			if(strcmp($testPlainText,$newConfPlainTxtStr)==0){
+				if($this->writeConf($newConfEncStr)){
+					return true;
+				}else{
+					return false;
+				}
+			}else{
+				return false;
+			}
+		}
+		
+		/* 
+		   The next two functions are for the lazy man in me.
+		   Save an object to an encrypted file and restore it.
+		   
+		   Be sure to first create the object before assigning
+		   the restored value.  For some reason, it doesn't work
+		   right otherwise
+		*/
+		
+		function saveEncObj($obj){
+			$serilizedData=$this->recursiveSerialize($obj);
+			//quick test, can the data still be unserialized?
+			if(unserialize($serilizedData)){
+				if($serilizedData){
+					if($this->writeEncConf($serilizedData)){
+						return true;
+					}else{
+						return false;
+					}
+				}else{
+					return false;
+				}
+			}else{
+				return false;
+			}
+		}
+		
+		function restoreEncObj(){
+			return unserialize($this->readEncConf());
+		}
+		
+		function recursiveSerialize($dataObj){
+			if(is_object($dataObj)){
+				$membvarsArr=get_object_vars($dataObj);
+				foreach($membvarsArr as $name => $value){
+					if(is_object($name)){
+						$dataObj->name=recursiveSerialize($dataObj->name);
+					}
+				}
+				return serialize($dataObj);
+			}else{
+				return false;
+			}
+			
+		}
+	}
+
+?>

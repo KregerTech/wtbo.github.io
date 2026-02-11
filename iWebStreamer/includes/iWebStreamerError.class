@@ -1,0 +1,43 @@
+<?
+
+	/*
+		This class registers and reports errors
+	*/
+	
+	class iWebStreamerError {
+	
+		var $warnings = array ();
+		
+		function registerWarning($errorStr){
+			array_push($this->warnings, $errorStr);
+		}
+		
+		function displayWarnings(){
+			foreach($this->warnings as $index => $warningStr){
+				echo "warning #".($index+1).": $warningStr<br>";;
+			}
+			//now clear the warnings
+			$this->warnings = array();
+		}
+		
+		function registerCritical($criticalStr){
+			global $saveConf;
+			$saveConf=false;
+			//header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+			//header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
+			?>
+				
+					<br><br>
+					<font color="#E94D02"><b>Error:</b></font><br><br>
+			<?
+				echo $criticalStr;
+			?>
+					
+					</body>
+				</html>
+			<?
+			die();
+		}
+	}
+
+?>

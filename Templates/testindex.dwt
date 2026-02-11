@@ -1,0 +1,178 @@
+<html>
+<head>
+<title>When Two Become One</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<script type="text/JavaScript">
+<!--
+function MM_preloadImages() { //v3.0
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+
+function MM_findObj(n, d) { //v4.01
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && d.getElementById) x=d.getElementById(n); return x;
+}
+
+function MM_nbGroup(event, grpName) { //v6.0
+  var i,img,nbArr,args=MM_nbGroup.arguments;
+  if (event == "init" && args.length > 2) {
+    if ((img = MM_findObj(args[2])) != null && !img.MM_init) {
+      img.MM_init = true; img.MM_up = args[3]; img.MM_dn = img.src;
+      if ((nbArr = document[grpName]) == null) nbArr = document[grpName] = new Array();
+      nbArr[nbArr.length] = img;
+      for (i=4; i < args.length-1; i+=2) if ((img = MM_findObj(args[i])) != null) {
+        if (!img.MM_up) img.MM_up = img.src;
+        img.src = img.MM_dn = args[i+1];
+        nbArr[nbArr.length] = img;
+    } }
+  } else if (event == "over") {
+    document.MM_nbOver = nbArr = new Array();
+    for (i=1; i < args.length-1; i+=3) if ((img = MM_findObj(args[i])) != null) {
+      if (!img.MM_up) img.MM_up = img.src;
+      img.src = (img.MM_dn && args[i+2]) ? args[i+2] : ((args[i+1])? args[i+1] : img.MM_up);
+      nbArr[nbArr.length] = img;
+    }
+  } else if (event == "out" ) {
+    for (i=0; i < document.MM_nbOver.length; i++) {
+      img = document.MM_nbOver[i]; img.src = (img.MM_dn) ? img.MM_dn : img.MM_up; }
+  } else if (event == "down") {
+    nbArr = document[grpName];
+    if (nbArr)
+      for (i=0; i < nbArr.length; i++) { img=nbArr[i]; img.src = img.MM_up; img.MM_dn = 0; }
+    document[grpName] = nbArr = new Array();
+    for (i=2; i < args.length-1; i+=2) if ((img = MM_findObj(args[i])) != null) {
+      if (!img.MM_up) img.MM_up = img.src;
+      img.src = img.MM_dn = (args[i+1])? args[i+1] : img.MM_up;
+      nbArr[nbArr.length] = img;
+  } }
+}
+
+function KW_s(r, g, b, el) {
+    d=document;hr=r.toString(16);hg=g.toString(16);hb=b.toString(16);
+	hr=(hr.length==1)?"0"+hr:hr;hg=(hg.length==1)?"0"+hg:hg;hb=(hb.length==1)?"0"+hb:hb;
+	if (d.getElementById) d.getElementById(el).style.color="#"+hr+hg+hb;
+}
+
+function KW_c(a,b,s,i) { return Math.floor(a*((s-i)/s)+b*(i/s)) }
+
+function KW_fade(r,g,b,e,n,l,s,o){
+    for(i=0;i<=s;i++)setTimeout("KW_s("+KW_c(r,e,s,i)+","+KW_c(g,n,s,i)+","+KW_c(b,l,s,i)+",'"+o+"');",i*s);
+}
+//-->
+</script>
+<style type="text/css">
+<!--
+#Layer1 {
+	position:absolute;
+	width:67px;
+	height:20;
+	z-index:1;
+	left: 154px;
+	top: 121px;
+}
+#Layer2 {
+	position:absolute;
+	width:89px;
+	height:20;
+	z-index:2;
+	left: 237px;
+	top: 121px;
+}
+#Layer3 {
+	position:absolute;
+	width:103px;
+	height:20;
+	z-index:3;
+	left: 336px;
+	top: 121px;
+	visibility: inherit;
+}
+#Layer4 {
+	position:absolute;
+	width:120px;
+	height:20;
+	z-index:4;
+	left: 443px;
+	top: 121px;
+	visibility: inherit;
+}
+#Layer5 {
+	position:absolute;
+	width:90px;
+	height:20;
+	z-index:5;
+	left: 567px;
+	top: 121px;
+	visibility: inherit;
+}
+.style7 {font-size: 11px; font-family: Verdana, Arial, Helvetica, sans-serif; color: #993300; }
+a:link {
+	color: #993300;
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+	color: #993300;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+	color: #993300;
+}
+-->
+</style>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" topmargin="0" onLoad="MM_preloadImages('menubookrollover.png')">
+<table width="642" border="0" cellpadding="0" cellspacing="0">
+  <tr> 
+    <td background="../test/theauthors.html"><img src="../test/header.png" alt="Header" width="648" height="150" align="top" longdesc="../test/header.png">
+      <div id="Layer5">
+        <h5 align="center" class="style7"><a href="../test/ordernow.html" id="kaos4333" onMouseOver="KW_fade(153,51,0,153,102,0,12,this.id)" onMouseOut="KW_fade(153,102,0,153,51,0,12,this.id)">Order Now</a> </h5>
+      </div>
+      <div id="Layer4">
+        <h5 align="center" class="style7"><a href="../test/relatedresources.html" id="kaos1028" onMouseOver="KW_fade(153,51,0,153,102,0,12,this.id)" onMouseOut="KW_fade(153,102,0,153,51,0,12,this.id)">Related Resources</a> </h5>
+      </div>
+    <div id="Layer2">
+      <h5 align="center" class="style7"><a href="../test/theauthors.html" id="kaos5737" onMouseOver="KW_fade(153,51,0,153,102,0,12,this.id)" onMouseOut="KW_fade(153,102,0,153,51,0,12,this.id)">The Authors</a> </h5>
+    </div>
+    <div id="Layer3">
+      <h5 align="center" class="style7"><a href="../test/theintro.html" id="kaos4520" onMouseOver="KW_fade(153,51,0,153,102,0,12,this.id)" onMouseOut="KW_fade(153,102,0,153,51,0,12,this.id)">The Intro </a></h5>
+    </div></td>
+  </tr>
+  <tr> 
+    <td height="100" align="left" valign="top"><table width="600">
+        <tr>
+          <td align="left" valign="top"><!-- TemplateBeginEditable name="EditRegion1" -->
+            <p class="style7">Preface</p>
+            <p>&nbsp;</p>
+            <p></p>
+            <p class="style7">&nbsp;</p>
+          <!-- TemplateEndEditable --></td>
+        </tr>
+        <tr>
+          <td><div align="center" class="style7">
+            <hr>
+            <a href="../test/thebook.html">The Book</a> | <a href="../test/theauthors.html">The Authors</a> | <a href="../test/theintro.html">The Intro</a> | <a href="../test/relatedresources.html">Related Resources</a> | <a href="../test/ordernow.html">Order Now </a></div></td>
+        </tr>
+      </table>
+    <div align="right"></div></td>
+  </tr>
+</table>
+<div id="Layer1"> 
+  <h5 align="center" class="style7"><a href="../test/thebook.html" id="kaos2189" onMouseOver="KW_fade(153,51,0,153,102,0,12,this.id)" onMouseOut="KW_fade(153,51,0,153,102,0,12,this.id)">The Book</a> </h5>
+</div>
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="javascript:;" target="_top" onClick="MM_nbGroup('down','group1','menubook','menubookrollover.png',1)" onMouseOver="MM_nbGroup('over','menubook','menubookrollover.png','menubookrollover.png',1)" onMouseOut="MM_nbGroup('out')"></a></td>
+  </tr>
+</table>
+</body>
+</html>

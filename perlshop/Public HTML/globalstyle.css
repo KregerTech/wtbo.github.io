@@ -1,0 +1,47 @@
+a		{color:darkblue}
+a:visited	{color:darkblue}
+a:hover	{color:blue}
+
+body		{font-family: Arial}
+h1		{color:blue}
+th		{font-family: Arial}
+td		{font-family: Arial}
+
+.buttonNormal		{color:black;  font-weight:bold}
+.buttonOver  		{color:yellow; font-weight:bold; cursor:hand}
+.buttonDown  		{color:green; font-weight:bold; cursor:hand}
+.buttonOut   		{color:black; font-weight:bold; cursor:normal}
+
+.cartHeaderRow		{background-color:lightgrey}
+.cartItemRow		{color:black}
+.cartSubtotalRow		{color:black}
+.cartTaxRow			{color:darkblue; font-weight:bold}
+
+.discountRow		{color:darkblue; background-color:lightgrey}
+
+.invoiceAddress		{color:black}
+.invoiceContents		{color:black}
+.invoiceData		{color:black}
+.invoiceDiscount		{color:green}
+.invoiceRebate		{color:green}
+.invoiceTitle		{color:blue; font-weight:bold}
+.invoiceTotal		{color:black}
+
+.orderformHeader		{color:darkblue}
+.orderformField		{color:black}
+
+.rebateRow			{color:darkblue; background-color:lightgrey}
+
+.searchResultData		{color:black; background-color:white}
+.searchResultHeader	{color:black; background-color:lightgrey}
+
+.shippingHeaderRow	{background-color:lightgrey}
+.shippingItemRow		{color:black}
+
+.specialtylink		{color:darkgreen}
+
+#catalogpage		{font-family: Arial}
+
+#errorpage			{color:red; font-family: Arial}
+
+#orderpage			{font-family: Arial}

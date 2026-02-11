@@ -1,0 +1,182 @@
+<?
+	/*
+		File.class
+		Object representation of an audio file
+	*/
+	
+	class File {
+	
+		var $fileId='';
+		var $fileName='';
+		var $title='';
+		var $author='';
+		var $md5='';
+		
+		function File($fileId, $fileName, $title, $author){
+			$this->setFileId($fileId);
+			$this->setFileName($fileName);
+			$this->setTitle($title);
+			$this->setAuthor($author);
+			$this->setMd5();
+		}
+		
+		function getFileName(){
+			return $this->fileName;
+		}
+		
+		function getFileId(){
+			return $this->fileId;
+		}
+		
+		function getMd5(){
+			return $this->md5;
+		}
+		
+		//in megs
+		function getFileSize(){
+			$audioFile=escapeshellarg(AUDIOFILESDIR.'/'.$this->getFileName());
+			$usage=round(intval(trim(`\`which du\` -k $audioFile | \`which awk\` '{print $1}'`))/1024, 1);
+			return $usage;
+		}
+		
+		function getFileSizeBytes(){
+			$audioFile=escapeshellarg(AUDIOFILESDIR.'/'.$this->getFileName());
+			$usage=intval(trim(`\`which du\` -b $audioFile | \`which awk\` '{print $1}'`));
+			return $usage;
+		}
+		
+		function getAuthor(){
+			return $this->author;
+		}
+		
+		function getTitle(){
+			return $this->title;
+		}
+		
+		function getDirectUrl(){
+			return AUDIOBASEURL.'/'.$this->getFileName();
+		}
+		
+		function getPreviewUrl(){
+			return PREVIEWPLAYERURL.'?fileId='.$this->getFileId();
+		}
+		
+		function getDuration(){
+			$audioFile=escapeshellarg(AUDIOFILESDIR.'/'.$this->getFileName());
+			$cmd=READMP3SECSCMD." ".$audioFile;
+			$result=`$cmd`;
+			$secs=intval(trim($result));
+			return $secs;
+		}
+		
+		//true, file is in use
+		function isFileInUse(){
+			global $podcastInfoObj, $webstreamInfoObj;
+			
+			foreach($podcastInfoObj->getPodcastsArr() as $podcastId => $podcastObj){
+				
+				foreach($podcastObj->getPodcastFilesArr() as $podcastFileId => $podcastFileObj){
+					if((!$podcastFileObj->getIsRFAudio())&&($this->getFileId()==$podcastFileObj->getFileId())){
+						return true;
+					}
+				}
+			}
+			
+			foreach($webstreamInfoObj->getWebStreamsArr() as $webstreamId => $webstreamObj){
+				
+				foreach($webstreamObj->getWebStreamFileArr() as $webStreamFileId => $webStreamFileObj){
+					if((!$webStreamFileObj->getIsRFAudio())&&($this->getFileId()==$webStreamFileObj->getFileId())){
+						return true;
+					}
+				}
+			}
+			
+			return false;
+		}
+		
+		function getPodCastIdsUsingFile(){
+			global $podcastInfoObj;
+			$podcastIdsArr=array();
+			foreach($podcastInfoObj->getPodcastsArr() as $podcastId => $podcastObj){
+				
+				foreach($podcastObj->getPodcastFilesArr() as $podcastFileId => $podcastFileObj){
+					if((!$podcastFileObj->getIsRFAudio())&&($this->getFileId()==$podcastFileObj->getFileId())){
+						array_push($podcastIdsArr, $podcastId);
+					}
+				}
+			}
+			return array_unique($podcastIdsArr);
+		}
+		
+		function getWebStreamIdsUsingFile(){
+			global $webstreamInfoObj;
+			$webstreamIdsArr=array();
+			foreach($webstreamInfoObj->getWebStreamsArr() as $webstreamId => $webstreamObj){
+				
+				foreach($webstreamObj->getWebStreamFileArr() as $webStreamFileId => $webStreamFileObj){
+					if((!$webStreamFileObj->getIsRFAudio())&&($this->getFileId()==$webStreamFileObj->getFileId())){
+						array_push($webstreamIdsArr, $webstreamId);
+					}
+				}
+			}
+			return array_unique($webstreamIdsArr);
+		}
+		
+		function deleteFileFromPodcastsAndWebStreams(){
+		
+			if($this->isFileInUse()){
+				global $iWebStreamerConf, $webstreamInfoObj, $podcastInfoObj, $confFileObj, $iWebStreamerErrorObj;
+				
+				foreach($this->getPodCastIdsUsingFile() as $index => $podcastId){
+					$podcastObj=$podcastInfoObj->getPodcastObj($podcastId);
+					$podcastFilesArr=$podcastObj->getPodcastFilesArr();
+					foreach($podcastFilesArr as $podcastFileId => $podcastFileObj){
+						if(($podcastFileObj->getFileId()==$this->getFileId())&&!($podcastFileObj->getIsRFAudio())){
+							$podcastObj->removePodcastFile($podcastFileId);
+						}
+					}
+				}
+				
+				foreach($this->getWebStreamIdsUsingFile() as $index => $webStreamId){
+					$webStreamObj=$webstreamInfoObj->getWebStreamObj($webStreamId);
+					$webStreamFilesArr=$webStreamObj->getWebStreamFileArr();
+					foreach($webStreamFilesArr as $webStreamFileId => $webStreamFileObj){
+						if(($webStreamFileObj->getFileId()==$this->getFileId())&&!($webStreamFileObj->getIsRFAudio())){
+							$webStreamObj->removeWebStreamFile($webStreamFileId);
+						}
+					}
+				}
+				
+				if($confFileObj->saveEncObj($iWebStreamerConf)){
+					return true;
+				}else{
+					$iWebStreamerErrorObj->registerCritical("Failed to save the conf file.");
+					return false;
+				}
+			}else{
+				return true;
+			}
+		}
+		
+		function setFileName($fileName){
+			$this->fileName=$fileName;
+		}
+		
+		function setTitle($title){
+			$this->title=$title;
+		}
+		
+		function setFileId($fileId){
+			$this->fileId=$fileId;
+		}
+		
+		function setAuthor($authorName){
+			$this->author=$authorName;
+		}
+		
+		function setMd5(){
+			$this->md5=md5_file(AUDIOFILESDIR.'/'.$this->getFileName());
+		}
+		
+	}
+?>

@@ -1,0 +1,83 @@
+<?
+	/*
+		File.class
+		Object representation of an audio file
+	*/
+	
+	class RfAudioFile {
+	
+		var $rfAudioFile_id='';
+		var $fileName='';
+		var $title='';
+		var $author='';
+		
+		function RfAudioFile($rfAudioFile_id, $fileName, $title, $author){
+			$this->setRfAudioFile_id($rfAudioFile_id);
+			$this->setFileName($fileName);
+			$this->setTitle($title);
+			$this->setAuthor($author);
+		}
+		
+		function getFileName(){
+			return $this->fileName;
+		}
+		
+		function getRfAudioFile_id(){
+			return $this->rfAudioFile_id;
+		}
+		
+		function getAuthor(){
+			return $this->author;
+		}
+		
+		function getTitle(){
+			return $this->title;
+		}
+		
+		function getDirectUrl(){
+			return RFAUDIOBASEURL.'/'.$this->getFileName();
+		}
+		
+		function getPreviewUrl(){
+			return PREVIEWPLAYERURL.'?rfAudioFile_id='.$this->getRfAudioFile_id();
+		}
+		
+		//in megs
+		function getFileSize(){
+			$audioFile=escapeshellarg(AVAILRFAUDIOFILESDIR.'/'.$this->getFileName());
+			$usage=round(intval(trim(`\`which du\` -k $audioFile | \`which awk\` '{print $1}'`))/1024, 1);
+			return $usage;
+		}
+		
+		function getFileSizeBytes(){
+			$audioFile=escapeshellarg(AVAILRFAUDIOFILESDIR.'/'.$this->getFileName());
+			$usage=intval(trim(`\`which du\` -b $audioFile | \`which awk\` '{print $1}'`));
+			return $usage;
+		}
+		
+		function getDuration(){
+			$audioFile=escapeshellarg(AVAILRFAUDIOFILESDIR.'/'.$this->getFileName());
+			$cmd=READMP3SECSCMD." ".$audioFile;
+			$result=`$cmd`;
+			$secs=intval(trim($result));
+			return $secs;
+		}
+		
+		function setFileName($fileName){
+			$this->fileName=$fileName;
+		}
+		
+		function setTitle($title){
+			$this->title=$title;
+		}
+		
+		function setRfAudioFile_id($rfAudioFile_id){
+			$this->rfAudioFile_id=$rfAudioFile_id;
+		}
+		
+		function setAuthor($authorName){
+			$this->author=$authorName;
+		}
+		
+	}
+?>

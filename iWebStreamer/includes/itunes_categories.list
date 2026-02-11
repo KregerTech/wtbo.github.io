@@ -1,0 +1,113 @@
+<?
+	/*
+		Follow the format below, it speaks for itself
+		
+		As of the writing of this program, there are categories
+		and sub-categories.  If Steve Jobs decides to make iTunes
+		go deeper (sub-sub-categories), the program would need a 
+		serious re-write, so don't try it.
+	*/
+	
+	$iTunesCategories=
+		array(
+			'Arts & Entertainment' => array(
+				'Architecture',
+				'Books',
+				'Design',
+				'Entertainment',
+				'Games',
+				'Performing Arts',
+				'Photography',
+				'Poetry',
+				'Science Fiction'
+			),
+			
+			'Audio Blogs'=>array(),
+			
+			'Business'=>array(
+				'Careers',
+				'Finance',
+				'Investing',
+				'Management',
+				'Marketing'
+				),
+				
+			'Comedy'=>array(),
+			
+			'Education'=>array(
+				'Higher Education',
+				'K-12'
+			),
+			
+			'Family'=>array(),
+			
+			'Food'=>array(),
+			
+			'Health'=>array(
+				'Diet & Nutrition',
+				'Fitness',
+				'Relationships',
+				'Self-Help'
+			),
+			
+			'International'=>array(
+				'Australian',
+				'Belgian',
+				'Brazilian',
+				'Canadian',
+				'Chinese',
+				'Dutch',
+				'French',
+				'German',
+				'Hebrew',
+				'Italian',
+				'Japanese',
+				'Norwegian',
+				'Polish',
+				'Portuguese',
+				'Spanish',
+				'Swedish'
+			),
+			
+			'Movies & Television'=>array(),
+			
+			'Music'=>array(),
+			
+			'News'=>array(),
+			
+			'Politics'=>array(),
+			
+			'Public Radio'=>array(),
+			
+			'Religion & Spirituality'=>array(
+				'Christianity'
+			),
+			
+			'Science'=>array(),
+			
+			'Sports'=>array(),
+			
+			'Talk Radio'=>array(),
+			
+			'Technology'=>array(
+				'Computers',
+				'Developers',
+				'Gadgets',
+				'Information Technology',
+				'News',
+				'Operating Systems',
+				'Podcasting',
+				'Smart Phones',
+				'Text/Speech'
+			),
+			
+			'Transportation'=>array(
+				'Automotive',
+				'Aviation',
+				'Bicycles',
+				'Commuting'
+			),
+			
+			'Travel'=>array()
+		);
+?>

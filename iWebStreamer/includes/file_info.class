@@ -1,0 +1,78 @@
+<?
+/*
+	file_info.class
+	
+	This class will read the conf file for uploaded files
+	and check to make sure those files still exist.  If they
+	do not exist, the conf file is updated.  This will prevent
+	people from uploading files and being able to use them
+	in this program.
+	
+	If the conf file or the audio directory does not exist
+	they are created.
+*/
+	require_once(dirname(__FILE__).'/File.class');
+
+	class file_info {
+		
+		/*
+			files_array[file_id]=File Obj;
+		*/
+		var $files_array =  array();
+		var $idCount = 0;
+		
+		//bool true = added successfully
+		//false = failed to add (file didn't exist)
+		//when adding a file, it must already exist
+		function addFile($fileName, $title, $author){
+			if(file_exists(AUDIOFILESDIR.'/'.$fileName)){
+				$this->files_array[$this->idCount]=new File ($this->idCount, $fileName, $title, $author);
+				$this->idCount++;
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		
+		//remove a file from the available file array
+		//will delete the existing file if it exists
+		function removeFile($fileId){
+		
+			$newFilesArray=array();
+			foreach($this->files_array as $thisFileId => $fileObj){
+				if($thisFileId!=$fileId){
+					$newFilesArray[$thisFileId]=$fileObj;
+				}elseif(file_exists(AUDIOFILESDIR.'/'.$fileObj->getFileName())){
+					if(!unlink(AUDIOFILESDIR.'/'.$fileObj->getFileName())){
+						global $iWebStreamerErrorObj;
+						$iWebStreamerErrorObj->registerCritical('Unable to remove 
+						'.AUDIOFILESDIR.'/'.$fileObj->getFileName().'.');
+						return false;
+					}
+				}
+			}
+			$this->files_array=$newFilesArray;
+			return true;
+		}
+		
+		function getFileObj($fileId){
+			if(array_key_exists($fileId, $this->getFilesArr())){
+				return $this->files_array[$fileId];
+			}else{
+				return false;
+			}
+		}
+		
+		function getFilesArr(){
+			return $this->files_array;
+		}
+		
+		function getAudioDiskUsageMegs(){
+			$audioDir=escapeshellarg(AUDIOFILESDIR);
+			$usage=round(intval(trim(`\`which du\` -k $audioDir | \`which awk\` '{print $1}'`))/1024, 1);
+			return $usage;
+		}
+	}
+
+?>

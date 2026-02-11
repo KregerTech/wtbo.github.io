@@ -1,0 +1,278 @@
+#######################################################################
+#                    Global File Location variables                   #
+#######################################################################
+$sc_use_merchantscript = "yes";
+
+$sc_sales_tax_form_variable = "Ecom_ShipTo_Postal_StateProv";
+$cart_font_style = "<FONT FACE=ARIAL SIZE=2>";
+
+$sc_cgi_lib_path = "./library/cgi-lib.pl";
+$sc_mail_lib_path = "./library/mail-lib.pl";
+
+$sc_html_search_routines_library_path = "./library/commerce_html_search.pl";
+$sc_html_setup_file_path = "./library/commerce_html_lib.pl";
+$sc_process_order_lib_path = "./library/$sc_gateway_name-order_lib.pl";
+
+$sc_commerce_subs_path = "./library/commerce_subs.pl";
+$sc_cookie_lib = "./library/cookie-lib.pl";
+
+$sc_store_header_file = "./html/html-templates/store_header.inc";
+$sc_store_footer_file = "./html/html-templates/store_footer.inc";
+
+$sc_secure_store_header_file = "./html/html-templates/secure_store_header.inc";
+$sc_secure_store_footer_file = "./html/html-templates/secure_store_footer.inc";
+
+$sc_db_lib_path = "./library/commerce_db_lib.pl";
+$sc_order_lib_path = "./library/commerce_order_lib.pl";
+$sc_pgp_lib_path = "./library/pgp-lib.pl";
+
+$sc_user_carts_directory_path = "./shopping_carts";
+$sc_data_file_path = "./data_files/data.file";
+
+$sc_options_directory_path = "./html/options/";
+$sc_html_product_directory_path = "./html/pages";
+$sc_html_order_form_path = "./html/$sc_gateway_name-orderform.html";
+$sc_store_front_path = "./html/pages/frontpage.html";
+
+$sc_counter_file_path = "./admin_files/counter.file";
+
+$sc_error_log_path = "./log_files/error.log";
+$sc_access_log_path = "./log_files/access.log";
+
+$sc_main_script_url = "merchant.cgi";
+$error_page = "./html/pages/error.html";
+
+#######################################################################
+#                Database Definition Variables                        #
+#######################################################################
+
+$db{"product_id"}  = 0;
+$db{"product"}     = 1;
+$db{"price"}       = 2;
+$db{"name"}        = 3;
+$db{"image_url"}   = 4;
+$db{"description"} = 5;
+$db{"shipping"}    = 6;
+$db{"user1"}       = 7;
+$db{"user2"}       = 8;
+$db{"user3"}       = 9;
+$db{"user4"}       = 10;
+$db{"user5"}       = 11;
+$db{"options"}     = 12;
+
+
+@sc_db_display_fields = ("Product");
+
+@sc_db_index_for_display = ($db{"image_url"},
+                            $db{"name"},
+                            $db{"description"},
+                            $db{"options"},
+                            $db{"price"},
+                            $db{"shipping"},
+                            $db{"user1"},
+                            $db{"user2"},
+                            $db{"user3"},
+                            $db{"user4"},
+                            $db{"user5"});
+
+@sc_db_index_for_defining_item_id =
+($db{"product_id"},
+ $db{"product"},
+ $db{"price"},
+ $db{"name"},
+ $db{"image_url"},
+ $db{"shipping"});
+
+$sc_db_index_of_price = $db{"price"};
+
+@sc_db_query_criteria = ("query_price_low_range|2|<=|number",
+                         "query_price_high_range|2|>=|number",
+                         "product|1|=|string",
+                         "itemnumber|0|=|number",
+                         "keywords|1,5,7,8,9,10,11|=|string");  
+
+#######################################################################
+#                    Cart Definition Variables                        #
+#######################################################################
+
+# The cart associative array is defined via the following steps:
+#                
+# 1. The 0th field is ALWAYS the quantity of the purchased item
+#
+# 2. The subsequent fields are the same fields defined
+#    in the @sc_db_index_for_defining_item_id variable.
+#    This is done because whatever is defined in this array,
+#    becomes the part of the product defined in the user's cart.
+#
+#       
+# 3. The field before the next to last field is ALWAYS the   
+#    "options" that have been selected by the user.  If you are    
+#     not using options, this field still needs to be here. It will
+#     just be used as an empty place marker.
+#       
+# 4. The next to last field is ALWAYS the price
+#    after options have been calculated in with the normal price.
+#       
+# 5. The last field is ALWAYS a computer generated
+#    unique identifier to distinguish cart line items from
+#    each other.
+
+                    
+$cart{"quantity"}            = 0;
+$cart{"product_id"}          = 1;
+$cart{"product"}             = 2;
+$cart{"price"}               = 3;
+$cart{"name"}                = 4;
+$cart{"image"}               = 5;
+$cart{"shipping"}            = 6;
+$cart{"options"}             = 7;
+$cart{"price_after_options"} = 8;
+$cart{"unique_cart_line_id"} = 9;
+
+$sc_cart_index_of_price = $cart{"price"};
+$sc_cart_index_of_price_after_options =
+$cart{"price_after_options"};
+
+# this will show the index of another column of our choice
+# to measure -- such as weight or volume if we are selling
+# something where the weight or volume affects the shipping
+# or discount logic.
+
+$sc_cart_index_of_measured_value = $cart{"shipping"};
+
+@sc_cart_display_fields = ("Quantity", "Product", "Price", "Base Shipping", "Options", "Subtotal");
+
+@sc_cart_index_for_display = ($cart{"quantity"}, $cart{"name"}, $cart{"price"}, $cart{"shipping"}, $cart{"options"}, $cart{"price_after_options"});
+
+$sc_cart_index_of_item_id = $cart{"product_id"};
+$sc_cart_index_of_quantity = $cart{"quantity"};
+
+
+# The following will generate hidden fields with
+# the contents of the cart inside of them.
+ 
+$sc_order_with_hidden_fields = "yes";
+
+# increasing numerical value (1,2,3) if its 0,
+# then it never gets calculated at this stage
+
+$sc_calculate_discount_at_display_form = 0;
+$sc_calculate_discount_at_process_form = 0;
+
+$sc_calculate_shipping_at_display_form = 3;
+$sc_calculate_shipping_at_process_form = 3;
+
+$sc_calculate_sales_tax_at_display_form = 3;
+$sc_calculate_sales_tax_at_process_form = 3;
+
+@sc_order_form_shipping_related_fields = ();
+
+@sc_order_form_discount_related_fields = ();
+
+# Shipping_logic is an array of criteria of what type of
+# shipping cost to apply.
+# The first pipe-delimited fields correspond to the
+# sc_order_form_shipping_related_fields. 
+#
+# Subsequent fields correspond to total quantity, total price,
+# and total measurement field. If the field is left blank,
+# then that total does not enter into the equation of what
+# shipping logic to apply.
+#
+# The last field is the amount of shipping to apply.
+# It is either a hard dollar amount or it is a percentage
+# (indicated by % sign) that will be applied to the 
+# total price of the order.
+#
+
+@sc_shipping_logic = ("|1||$ship_amount","|2||$ship_amount");
+
+# Discount logic is the same as shipping logic except
+# that whatever value is calculated for the discount will
+# be subtracted rather than added to the grand total.
+
+@sc_discount_logic  = ();
+
+$sc_order_check_db = "yes";
+ 
+# Do we use PGP Encryption -- WARNING: This is a difficult
+# option to setup. You must go into the pgp-lib.pl file
+# and edit the pgp variables in the header for your specific
+# setup.
+# 
+
+$sc_use_pgp = "no";
+$sc_pgp_temp_file_path = "./admin_files";
+
+#######################################################################
+#                     Store Option Variables                          #
+#######################################################################
+
+$sc_use_html_product_pages = "no"; # A yes means that you will not generate
+                                   # Product pages using a database.
+
+$sc_shall_i_let_client_know_item_added = "yes";
+
+$sc_item_ordered_message = "
+<TR>
+<TD COLSPAN=3>
+<CENTER>
+<FONT FACE=ARIAL SIZE=-1 COLOR=red><b>Thank you!</b><br><font color=black>The item selected has been placed in your Shopping Cart.</font></FONT>
+</CENTER>
+</TD>
+</TR>
+<BR>
+";
+
+$sc_shall_i_email_if_error = "no";
+$sc_shall_i_log_errors = "yes"; 
+$sc_shall_i_log_accesses = "yes";
+
+#######################################################################
+#                    HTML Search Variables                            #  
+#######################################################################
+
+@sc_unwanted_files = ('*.cgi');
+
+#######################################################################
+#                  Error Message Variables                            #
+#######################################################################
+
+$sc_page_load_security_warning = "
+I am sorry, but you may only use this program to view HTML pages.
+";
+
+$sc_randomizer_error_message = "
+There must be something wrong with your local
+rand function because I cannot get a unique, random number for
+your shopping cart. Please check the call to rand in the Assign a
+Shopping Cart routine.
+";
+
+#######################################################################
+#                  Miscellaneous Variables                            #
+#######################################################################
+
+
+@acceptable_file_extensions_to_display = (".html", ".htm");
+$sc_money_symbol = "\$";
+$sc_money_symbol_placement = "front";
+$sc_number_days_keep_old_carts = .5;
+@sc_sales_tax_form_values = ("$sc_sales_tax_state");
+
+$sc_no_frames_button = qq!
+<INPUT TYPE = "submit" NAME = "return_to_frontpage_button" VALUE = "Return to Frontpage">
+!;
+
+$sc_product_display_title = "Product Listing";
+
+
+$sc_product_display_header = qq!
+<CENTER>
+<TABLE BORDER="0">
+!;
+
+$sc_product_display_footer = qq!
+</TABLE>
+</CENTER>!;
+

@@ -1,0 +1,41 @@
+<?
+	/*
+		Encryption.class
+		
+		NOTE: the custom binary /home/httpd/bin/php-cgi does not 
+		have mcrypt functions installed.  If using php as a cgi,
+		use /usr/local/dev/bin/php, a custom php 5 binary.
+		
+		Provide a simple interface to encrypt and
+		decrypt some data.  Probably very useful 
+		for reading and writing conf file data 
+		we don't want the user to actually be able
+		to see or modify.
+		
+		Constructor - no parameters required
+		
+		public functions
+			encrypt - returns an encrypted string
+			decrypt - returns a decrypted string
+	*/
+	
+	class Encryption {
+	
+		var $key = 'g8Nm3pLK39VsH6AlQ20oxY';
+		var $alg = MCRYPT_BLOWFISH;
+		var $mode = MCRYPT_MODE_CBC;
+		var $iv = 'B8V5YdSP';
+		
+		function encrypt($plainTextStr){
+			//$encryptedStr=trim(base64_encode(mcrypt_encrypt($this->alg, $this->key, $plainTextStr, $this->mode, $this->iv)));
+			//return $encryptedStr;
+			return $plainTextStr;
+		}
+		
+		function decrypt($encryptedStr){
+			//$plainTextStr=trim(mcrypt_decrypt($this->alg, $this->key, base64_decode($encryptedStr), $this->mode, $this->iv));
+			//return $plainTextStr;
+			return $encryptedStr;
+		}
+	}
+?>

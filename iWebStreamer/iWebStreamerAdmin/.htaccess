@@ -1,0 +1,11 @@
+addtype text/html .html .css .js .jpg .gif .swf .xspf
+AddHandler text/html .html .css .js .jpg .gif .swf .as
+AddHandler cgi-script .php
+Options +ExecCGI 
+#php_flag display_errors on
+AuthType Basic
+AuthName "iWebStreamer"
+AuthUserFile /var/www/vhosts/whentwobecomeone.net/pd/d..httpdocs@plesk-stat
+<Limit GET POST>
+require  valid-user
+</Limit>

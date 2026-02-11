@@ -1,0 +1,199 @@
+<?
+
+/*
+	This is a subclass extending the snoopy class.  This will allow us to gather some information
+	from the DSM to make this tool more useful
+*/
+
+require_once(dirname(__FILE__).'/Browse.class');
+
+
+class AdminBrowse extends Snoopy{	
+
+	var 	$host			=	"admin.christianwebhost.com";		// host name we are connecting to
+	var 	$port			=	80;					// port we are connecting to
+	var 	$proxy_host		=	"";					// proxy host to use
+	var 	$proxy_port		=	"";					// proxy port to use
+	var 	$agent			=	"-";				// agent we masquerade as
+	var 	$referer		=	"http://admin.christianwebhost.com/cp/apps/index.html";				// referer info to pass
+	var 	$cookies		=	array();			// array of cookies to pass
+												// $cookies["username"]="joe";
+	var	$rawheaders		=	array();			// array of raw headers to send
+												// $rawheaders["Content-type"]="text/html";
+
+	var 	$maxredirs		=	5;					// http redirection depth maximum. 0 = disallow
+	var 	$lastredirectaddr	=	"";				// contains address of last redirected address
+	var	$offsiteok		=	true;				// allows redirection off-site
+	var 	$maxframes		=	0;					// frame content depth maximum. 0 = disallow
+	var 	$expandlinks		=	true;				// expand links to fully qualified URLs.
+												// this only applies to fetchlinks()
+												// or submitlinks()
+	var 	$passcookies		=	true;				// pass set cookies back through redirects
+												// NOTE: this currently does not respect
+												// dates, domains or paths.
+	
+	var	$user			=	'apiuser';					// user for http authentication
+	var	$pass                   =       'p00head';					// password for http authentication
+						
+	var 	$accept			=	"image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, */*"; // http accept types
+	
+	var 	$results		=	"";					// where the content is put
+		
+	var 	$error			=	"";					// error messages sent here
+	var	$response_code		=	"";					// response code returned from server
+	var	$headers		=	array();			// headers returned from server sent here
+	var	$maxlength		=	500000;				// max return data length (body)
+	var 	$read_timeout		=	0;					// timeout on read operations, in seconds
+												// supported only since PHP 4 Beta 4
+												// set to 0 to disallow timeouts
+	var 	$timed_out		=	false;				// if a read operation timed out
+	var	$status			=	0;					// http request status
+	
+	var	$curl_path		=	"/usr/bin/curl";
+									
+	
+	
+	
+/*--------------------------------------------Member Functions------------------------------------------------------------------*/
+
+
+	//Give a user name and domain name returns
+	//an array (main and offNetwork) email addresses.
+	//false on error
+        function get_emails($user_name, $domain_name){
+                $this->results='';
+                $submit_url = 'http://'.$this->host.'/cp/apps/listDomain.html';
+		$submit_vars["exUserName"] = $user_name;
+                $submit_vars["frmDomainName"] = $domain_name;
+		$submit_vars["exParkedDomainName"] = "";
+		$submit_vars["exServer"]="0";
+		$submit_vars["exDomainStatus"]="";
+		$submit_vars["exSubmit"] = "Apply";	
+		$this->submittext($submit_url, $submit_vars);
+		$textArr=split("Free", $this->results);
+		$textArr2=split("\n", $textArr[1]);
+		$clientID=trim($textArr2[5]);
+		$this->results='';
+		$this->fetchform("http://".$this->host."/cp/apps/editClient.html?exClientID=".$clientID);
+		$textArr3=split("\r", $this->results);
+		//setting an error flag to make sure we pull up this page.
+		$error=true;
+		foreach($textArr3 as $index => $currLine){
+			$tempArr4=array();
+			if(preg_match('/exEmail/', $currLine)&&preg_match('/@/', $currLine)){
+				$tempArr4=preg_split('/"/', $currLine);
+				$email1=strtolower(trim($tempArr4[5]));
+				$error=false;
+			}elseif(preg_match('/exOutsideEmail/', $currLine)&&preg_match('/@/', $currLine)){
+				$tempArr4=preg_split('/"/', $currLine);
+				$email2=strtolower(trim($tempArr4[5]));
+				$error=false;
+			}
+		}
+		$emailArr['main']=$email1;
+		$emailArr['offNetwork']=$email2;
+		if(!$error){
+			return $emailArr;
+		}else{
+			return false;
+		}
+        }
+	
+	function get_password($user_name, $domain_name){
+		$this->results='';
+                $submit_url = 'http://'.$this->host.'/cp/apps/listDomain.html';
+		$submit_vars["exUserName"] = $user_name;
+                $submit_vars["frmDomainName"] = $domain_name;
+		$submit_vars["exParkedDomainName"] = "";
+		$submit_vars["exServer"]="0";
+		$submit_vars["exDomainStatus"]="";
+		$submit_vars["exSubmit"] = "Apply";	
+		$this->submittext($submit_url, $submit_vars);
+		$textArr=split("Free", $this->results);
+		$textArr2=split("\n", $textArr[1]);
+		$password=trim($textArr2[7]);
+		return $password;
+	}
+	
+	//return an array of current servers
+	/*
+		array[server_id]['hostname']=>'hostname' (string)
+		array[server_id]['ip']=>ip (int)
+		array[server_id]['active_ips']=>active_ips (int)
+		array[server_id]['limit']=>limit (int)
+	*/
+	function get_servers($pageNum=0){
+		$this->results='';
+		if($pageNum==0){
+			$url = 'http://'.$this->host.'/cp/apps/listServer.html';
+		}else{
+			$url = 'http://'.$this->host.'/cp/apps/listServer.html?&exPageNO='.$pageNum;
+		}
+		$this->fetchtext($url);
+		$textArr=preg_split('/CPs Last Month/', $this->results);
+		$textArr2=preg_split('/Main Menu/', $textArr[1]);
+		$textArr3=preg_split("/\n/", $textArr2[0]);
+		$textArr4=array();
+		foreach($textArr3 as $index => $text){
+			$textArr4[$index]=trim($text);
+		}
+		array_shift($textArr4);
+		$serverArr=array();
+		$i=0;
+		$tmpID='';
+		foreach($textArr4 as $index => $text){
+			$pattern=preg_quote('=');
+			if(preg_match('/'.$pattern.'/', $text)){
+				$pageNumArr1=preg_split('/=\d+=/', $text);
+				if(preg_match('/\[\d+\]/', $pageNumArr1[1])){
+					$page=stripos($pageNumArr1[1], '[', +1);
+					$tmpNewPage=$this->get_servers($page);
+					foreach($tmpNewPage as $id => $valueArr){
+						foreach($valueArr as $name => $value){
+							$serverArr[$id][$name]=$value;
+						}
+					}
+				}
+			}else{
+				switch($i) {
+					case 0:
+					{
+						$tmpID=$text;
+						break;
+					}
+					case 1:
+					{
+						$serverArr[strval($tmpID)]['hostname']=$text;
+						break;
+					}
+					case 2:
+					{
+						$serverArr[strval($tmpID)]['ip']=intval($text);
+						break;
+					}
+					case 4:
+					{
+						$serverArr[strval($tmpID)]['active_ips']=intval($text);
+						break;
+					}
+					case 5:
+					{
+						$serverArr[strval($tmpID)]['limit']=intval($text);
+						break;
+					}
+				}
+				if($i==7){
+					$i=0;
+				}else{
+					$i++;
+				}	
+			}
+		}
+		return $serverArr;
+	}
+	
+	
+	
+}
+
+?>

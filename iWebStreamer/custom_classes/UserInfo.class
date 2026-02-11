@@ -1,0 +1,319 @@
+<?php
+
+	/*
+		UserInfo.class
+		
+		Construction Requirements: 
+			access to the global array
+		
+		Description:
+			Provide information about the user
+			on the system.
+			
+		Public Methods:
+			getUser() - returns string of username
+			getDomainName() - returns the domain name
+			getUserRootDir() - returns a string containing the path to '/home/user'
+			getIP() - returns the domain ip
+			isValid() - returns either true or false, depending on whether
+			            or not the object could determine all the information.
+				    
+			
+			*a special public function is getPassword().  This requires communication with
+			the DSM, and I'd like to keep that to a minimum.  That means var $password will not
+			automatically be set.  the private "set_password" will only be called when the 
+			getter is called specifically (but only once per object, again, to minimize DSM hits).
+	*/
+	
+	require_once(dirname(__FILE__).'/AdminBrowse.class');
+	
+	class UserInfo{
+	
+		var $userName;
+		var $domainName;
+		var $IP;
+		var $userRootDir;
+		var $documentRoot;
+		var $validObj;
+		var $emailNum; //number of email addresses allocated to the user
+		var $quota;  //in bytes
+		var $package;
+		var $password = false;
+		
+		function UserInfo(){
+			
+			//initialize this to true
+			//and set to false if necessary
+			//in the private methods.
+			$this->validObj=true;//start out true, and set false on failure
+			
+			$this->setServerName();
+			$this->setUserName();
+			$this->setIP();
+			$this->setUserRootDir();
+			$this->setDocumentRoot();
+			$this->setQuota();
+			$this->setEmailNum();
+			$this->setPackage();
+		}
+		
+		//public
+		function isValid(){
+			return $this->validObj;
+		}
+		
+		//public
+		function getUser(){
+			return $this->userName;
+		}
+		
+		//public
+		function getDomainName(){
+			return $this->domainName;
+		}
+		
+		//public
+		function getUserRootDir(){
+			return $this->userRootDir;
+		}
+		
+		function getDocumentRoot(){
+			return $this->documentRoot;
+		}
+		
+		//public
+		function getIP(){
+			return $this->IP;
+		}
+		
+		//public
+		//special function, read docs at the top
+		function getPassword(){
+			if($this->validObj && !$this->password){
+				$this->setPassword();
+				return $this->password;
+			}
+		}
+		
+		//public (in bytes)
+		function getQuota(){
+			return $this->quota;
+		}
+		
+		function getEmailNum(){
+			return $this->emailNum;
+		}
+		
+		function getPackage(){
+			return $this->package;
+		}
+		
+		
+		//private
+		function setServerName(){
+			global $_SERVER;
+			
+			if(!isset($_SERVER['SERVER_NAME'])||$_SERVER['SERVER_NAME']==''){
+			
+				$this->validObj=false;
+			}else{
+				$this->domainName=strtolower(trim($_SERVER['SERVER_NAME']));
+			}
+		}
+		
+		//private
+		function setUserName(){
+	
+
+			/*	
+			//are we good so far
+			if($this->validObj){
+				//quickly and carefully open the mailertable and read it.
+				$mailertable='/etc/mail/mailertable';
+				if(file_exists($mailertable)&&is_readable($mailertable)){
+					$mailertableHndl=fopen($mailertable, 'r');
+					if(is_resource($mailertableHndl)){
+						if(flock($mailertableHndl, LOCK_EX)){
+							//read the mailertable into this.
+							$mailertableStr=fread($mailertableHndl, filesize($mailertable));
+							flock($mailertableHndl, LOCK_UN);
+							fclose($mailertableHndl);
+							//whew, read the mailertable.  Now
+							//do the work of trying to determine 
+							//the username.
+						
+							//split the string by line into an array
+							$mailertableArr=preg_split('/\n/',$mailertableStr);
+							
+							//initialize a resulting username.
+							//if at the end of scanning the mailertable
+							//it is still false, consider this a failure
+							//and just set validObj to false.
+							
+							$username=false;
+							
+							//an additional check is done to see if a match was
+							//found in a commented row.  If a commented row is found
+							//keep on looking.  An uncommented row would be considered
+							//more valid, so if we find an uncommented entry, stop the loop.
+							
+							$commentedRow=true;
+							
+							//begin scanning each row
+							foreach($mailertableArr as $index => $mailerTblRowStr){
+							
+								//make sure there is no whitespace surrounding	
+								$mailerTblRowStr=trim(strtolower($mailerTblRowStr));
+								
+								//only continue searching
+								//if a commented value was found
+								//or none at all (commentedRow is initialized to true)
+								if($commentedRow){
+									$thisCommented=false;
+									//procmail: must exist in the line to be a valid row
+									if(preg_match('/\s+procmail:/',$mailerTblRowStr)){
+									
+										//is the row commented?
+										//if so, strip the comment and set the local
+										//loop var thisCommented to true
+										if(preg_match('/^#/', $mailerTblRowStr)){
+											$thisCommented=true;
+											$tempMailerTblRowStrArr=preg_split('/\#/', $mailerTblRowStr);
+											$mailerTblRowStr=$tempMailerTblRowStrArr[1];
+										}
+									
+										//now strip out the domain
+										//and username parts
+										
+										//split the row on whitespace
+										$splitOnWhtSpaceArr=preg_split('/\s+/', $mailerTblRowStr);
+										
+										//match found?
+										if($this->domainName==$splitOnWhtSpaceArr[0]){
+											//get the username part
+											$tmpUserArr=preg_split('/procmail:/', $splitOnWhtSpaceArr[1]);
+										
+											//set the username, regardless
+											//of whether or not it was a 
+											//commented entry.  Only if it was
+											//not commented to we need to set the flag
+											$this->userName=$tmpUserArr[1];
+											if(!$thisCommented){
+												$commentedRow=false;
+											}
+										}
+									}
+								}
+							}
+							
+						}else{
+							fclose($mailertableHndl);
+							$this->validObj=false;
+						}
+					
+					}else{
+						$this->validObj=false;
+					}
+				}else{
+				
+					$this->validObj=false;
+				}
+			}
+
+			*/
+
+		}
+		
+		//private
+		function setUserRootDir(){
+			if($this->validObj){
+				if(file_exists('/home/'.$this->userName)){
+					$this->userRootDir='/home/'.$this->userName;
+				}else{
+					$this->validObj=false;
+				}
+			}
+		}
+		
+		function setDocumentRoot(){
+			global $_SERVER;
+			if($this->validObj){
+				if(file_exists($_SERVER['DOCUMENT_ROOT'])){
+					$this->documentRoot=$_SERVER['DOCUMENT_ROOT'];
+				}else{
+					$this->validObj=false;
+				}
+			}
+		}
+		
+		function setIP(){
+			if($this->validObj){
+				global $_SERVER;
+				$this->IP=$_SERVER['SERVER_ADDR'];
+			}
+		}
+		
+		function setPassword(){
+			if($this->validObj){
+				$browseObj=new AdminBrowse ();
+				$this->password=trim($browseObj->get_password($this->userName, $this->domainName));
+				//at least make sure this didn't come back empty.
+				//that's about all the error checking that can really be done here.
+				if(!$this->password){
+					$this->validObj=false;
+				}
+			}
+		}
+		
+		//in bytes
+		function setQuota(){
+		
+			$this->quota = intval(trim(`\`which quota\` $this->userName | \`which grep\` -v Disk | \`which grep\` -v Filesystem | \`which awk\` '{print $3}'`));
+		
+		}
+		
+		
+		//how many email addresses does the user have
+		function setEmailNum(){
+			$conf_fileArr=parse_ini_file (dirname(__FILE__).'/conf.inc', 'true');
+			$mailSettingsFile=$conf_fileArr['Mail Settings']['Mail Settings File'];
+			
+			$emailNum=1;
+			$handle = @fopen($mailSettingsFile, "r");
+			if ($handle) {
+   				while (!feof($handle)) {
+       					$buffer = trim(fgets($handle));
+					//now break apart the string
+					$splitLineArr=array();
+					$splitLineArr=preg_split('/:/', $buffer);
+					$thisLineDomainName=$splitLineArr[0];
+					$thisLineEmailNum=intval($splitLineArr[1]);
+					if(count($splitLineArr)>1){
+						if(!strcmp($this->getDomainName(), $thisLineDomainName)){
+						//domain name match found
+							$emailNum=$thisLineEmailNum;
+							break;
+						}
+					}
+   				}
+   				fclose($handle);
+			}
+			$this->emailNum = $emailNum;
+		}
+		
+		function setPackage(){
+			//read in the configuration file
+			$conf_fileArr=parse_ini_file (dirname(__FILE__).'/conf.inc', 'true');
+			
+			foreach($conf_fileArr['Packages'] as $packageName => $emailNum){
+				if($this->getEmailNum()>=$emailNum){
+					$this->package=$packageName;
+				}
+			}
+		}
+		
+	
+	}
+		
+		
+?>

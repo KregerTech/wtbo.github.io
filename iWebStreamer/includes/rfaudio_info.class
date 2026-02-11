@@ -1,0 +1,75 @@
+<?
+/*
+
+	rfaudio_info.class
+	
+	This class maintains the information related to royalty free audio
+	made available to the iWebStreamer program. This class is not
+	instantiated as part of the iWebStreamerConfFile.class, but
+	iwebstreams may instantiate an instance of this on the fly
+	in order to get information about the audio.
+
+*/
+
+	require_once(dirname(__FILE__).'/RfAudioFile.class');
+
+	class rfaudio_info {
+	
+		/*
+			RF_AudioFileArr[$rfAudioFile_id]=RfAudioFile obj
+		*/
+		var $RF_AudioFileArr = array();
+		var $idCount = 0;
+		
+		//will need altered between the iWebStreamer interface
+		//and the admin interface
+		var $rf_audio_fileDir = '';
+		
+		function setRf_audio_fileDir($rf_audio_fileDir){
+			$this->rf_audio_fileDir=$rf_audio_fileDir;
+		}
+		
+		function getRf_audio_fileDir(){
+			return $this->rf_audio_fileDir;
+		}
+		
+		function addRfAudioFile($fileName, $title, $author){
+			if(file_exists($this->rf_audio_fileDir.'/'.$fileName)){
+				$this->RF_AudioFileArr[$this->idCount]=new RfAudioFile ($this->idCount, $fileName, $title, $author);
+				$this->idCount++;
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		//remove a file from the available file array
+		//will delete the existing file if it exists
+		function removeRfAudioFile($rfAudioFile_id){
+		
+			$newRF_AudioFileArr=array();
+			foreach($this->getRfAudioFileArr() as $thisRfAudioFile_id => $RfAudioFileObj){
+				if($thisRfAudioFile_id!=$rfAudioFile_id){
+					$newRF_AudioFileArr[$thisRfAudioFile_id]=$RfAudioFileObj;
+				}elseif(file_exists($this->getRf_audio_fileDir().'/'.$RfAudioFileObj->getFileName())){
+					unlink($this->getRf_audio_fileDir().'/'.$RfAudioFileObj->getFileName());
+				}
+			}
+			$this->RF_AudioFileArr=$newRF_AudioFileArr;
+		}
+		
+		function getRfAudioFileArr(){
+			return $this->RF_AudioFileArr;
+		}
+		
+		function getRfAudioFileObjById($rfAudioFile_id){
+			if(array_key_exists($rfAudioFile_id, $this->getRfAudioFileArr())){
+				return $this->RF_AudioFileArr[$rfAudioFile_id];
+			}else{
+				return false;
+			}
+		}
+		
+	}
+
+?>
